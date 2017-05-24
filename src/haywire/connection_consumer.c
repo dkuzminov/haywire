@@ -59,14 +59,16 @@ void connection_consumer_alloc(uv_handle_t* handle, size_t suggested_size, uv_bu
     buf->len = sizeof(slab);
 }
 
-void connection_consumer_new_connection(uv_stream_t* server_handle, int status)
+void connection_consumer_new_connection(uv_stream_t* ctx, int status)
 {
+    uv_stream_t* server_handle = &((struct server_ctx*)ctx)->server_handle;
     int rc = 0;
     http_connection* connection = create_http_connection();
     http_parser_init(&connection->parser, HTTP_REQUEST);
     
     connection->parser.data = connection;
     connection->stream.data = connection;
+    connection->thread_id = ((struct server_ctx*)ctx)->index;
     
     rc = uv_tcp_init(server_handle->loop, &connection->stream);
     
@@ -121,7 +123,7 @@ void connection_consumer_start(void *arg)
     get_listen_handle(loop, (uv_stream_t*) &ctx->server_handle);
     uv_sem_post(&ctx->semaphore);
     
-    rc = uv_listen((uv_stream_t*)&ctx->server_handle, ctx->listen_backlog, connection_consumer_new_connection);
+    rc = uv_listen((uv_stream_t*)ctx, ctx->listen_backlog, connection_consumer_new_connection);
     rc = uv_run(loop, UV_RUN_DEFAULT);
     
     uv_loop_delete(loop);

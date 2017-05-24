@@ -388,7 +388,8 @@ int http_request_on_message_complete(http_parser* parser)
 
         if (route_entry != NULL)
         {
-            route_entry->callback(request, response, route_entry->user_data);
+            route_entry->callback(request, response, route_entry->user_data,
+                connection->stream.loop, connection->thread_id);
         }
         else
         {

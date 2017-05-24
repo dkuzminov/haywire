@@ -169,7 +169,7 @@ typedef struct
     enum {OK, SIZE_EXCEEDED, BAD_REQUEST, INTERNAL_ERROR} state;
 } http_request;
 
-typedef void (HAYWIRE_CALLING_CONVENTION *http_request_callback)(http_request* request, hw_http_response* response, void* user_data);
+typedef void (HAYWIRE_CALLING_CONVENTION *http_request_callback)(http_request* request, hw_http_response* response, void* user_data, void* uv_loop, int thread_id);
 typedef void (HAYWIRE_CALLING_CONVENTION *http_response_complete_callback)(void* user_data);
 
 HAYWIRE_EXTERN int hw_init_from_config(char* configuration_filename);
